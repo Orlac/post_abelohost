@@ -1,5 +1,10 @@
 {
     "require": {
         "smarty/smarty": "^5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\components\\": "components/"
+        }
     }
 }

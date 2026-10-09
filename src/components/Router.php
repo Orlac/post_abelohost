@@ -1,5 +1,13 @@
 <?php
 
+namespace app\components;
+
+use Closure;
+use ReflectionFunction;
+use ReflectionNamedType;
+use ReflectionParameter;
+use RuntimeException;
+
 class Router
 {
     /** @var list<array{method: string, path: string, handler: callable}> */

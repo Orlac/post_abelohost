@@ -1,5 +1,13 @@
 <?php
 
+namespace app\components;
+
+use Closure;
+use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionParameter;
+use RuntimeException;
+
 class Container
 {
     /** @var array<string, Closure> */

@@ -1,5 +1,10 @@
 <?php
 
+namespace app\components;
+
+use PDO;
+use Throwable;
+
 class MysqlDatabase implements DatabaseInterface
 {
     public function __construct(
