@@ -1,0 +1,4 @@
+mysql_data/
+src/vendor/
+src/node_modules/
+.env
