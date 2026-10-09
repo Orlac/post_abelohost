@@ -14,7 +14,9 @@ class IndexController
          * @var View $view
          */
         $view = Container::get(View::class);
-        return $view->render('home.tpl');
+        return $view->render('home.tpl', [
+            'title' => 'Главная'
+        ]);
     }
 
 
