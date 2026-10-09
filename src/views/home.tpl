@@ -1,0 +1,2 @@
+<img alt="Логотип" src="data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'><rect width=\'200\' height=\'200\' rx=\'36\' fill=\'%%234f46e5\'/><path d=\'M40 70l60 45 60-45v70a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10z\' fill=\'white\'/><path d=\'M40 60a10 10 0 0 1 10-10h100a10 10 0 0 1 10 10l-60 45z\' fill=\'%%23c7d2fe\'/></svg>">
+<h1>Привет! Приложение запущено 🚀</h1>

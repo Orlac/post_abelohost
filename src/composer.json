@@ -4,7 +4,8 @@
     },
     "autoload": {
         "psr-4": {
-            "app\\components\\": "components/"
+            "app\\components\\": "components/",
+            "app\\controllers\\": "controllers/"
         }
     }
 }
