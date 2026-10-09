@@ -27,14 +27,19 @@ class MysqlDatabase implements DatabaseInterface
         );
     }
 
+    public function connect(): PDO
+    {
+        return new PDO(
+            sprintf('mysql:host=%s;port=%s;dbname=%s', $this->host, $this->port, $this->database),
+            $this->username,
+            $this->password
+        );
+    }
+
     public function check(): string
     {
         try {
-            new PDO(
-                sprintf('mysql:host=%s;port=%s;dbname=%s', $this->host, $this->port, $this->database),
-                $this->username,
-                $this->password
-            );
+            $this->connect();
 
             return 'ok';
         } catch (Throwable $e) {

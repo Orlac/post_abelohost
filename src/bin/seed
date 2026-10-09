@@ -1,0 +1,74 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use app\components\MysqlDatabase;
+use Faker\Generator;
+
+function seed(Generator $faker, int $categories, int $articles): void
+{
+    $db = MysqlDatabase::fromEnv()->connect();
+
+    $db->exec('SET FOREIGN_KEY_CHECKS = 0');
+    $db->exec('TRUNCATE TABLE categories');
+    $db->exec('TRUNCATE TABLE articles');
+    $db->exec('TRUNCATE TABLE article_category_link');
+
+    $categoryIds = [];
+    $categoryStmt = $db->prepare('INSERT INTO categories (title, description, created_at) VALUES (?, ?, ?)');
+
+    for ($i = 0; $i < $categories; $i++) {
+        $categoryStmt->execute([
+            $faker->word(),
+            $faker->sentence(12),
+            $faker->dateTimeBetween('-6 months')->format('Y-m-d H:i:s'),
+        ]);
+        $categoryIds[] = (int) $db->lastInsertId();
+    }
+
+    $articleStmt = $db->prepare(
+        'INSERT INTO articles (title, description, text, image, views, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    $linkStmt = $db->prepare('INSERT IGNORE INTO article_category_link (aid, cid) VALUES (?, ?)');
+
+    for ($i = 0; $i < $articles; $i++) {
+        $createdAt = $faker->dateTimeBetween('-6 months')->format('Y-m-d H:i:s');
+        $updatedAt = $faker->optional(0.3)->dateTimeBetween($createdAt, 'now')?->format('Y-m-d H:i:s');
+
+        $articleStmt->execute([
+            $faker->sentence(6),
+            $faker->sentence(12),
+            $faker->paragraph(5),
+            $faker->optional(0.7)->imageUrl(640, 360, 'techn'),
+            $faker->numberBetween(0, 5000),
+            $createdAt,
+            $updatedAt,
+        ]);
+
+        $articleId = (int) $db->lastInsertId();
+
+        $numCategories = $faker->numberBetween(1, 3);
+        $chosen = (array) array_rand($categoryIds, $numCategories);
+
+        foreach ($chosen as $index) {
+            $linkStmt->execute([$articleId, $categoryIds[$index]]);
+        }
+    }
+
+    $db->exec('SET FOREIGN_KEY_CHECKS = 1');
+
+    echo "Seeded {$categories} categories, {$articles} articles, and their links." . PHP_EOL;
+}
+
+try {
+    $categories = max(0, (int) ($argv[1] ?? 100));
+    $articles = max(0, (int) ($argv[2] ?? 500));
+
+    $faker = Faker\Factory::create('ru_RU');
+    seed($faker, $categories, $articles);
+} catch (Throwable $e) {
+    echo 'Error: ' . $e->getMessage() . PHP_EOL;
+    exit(1);
+}

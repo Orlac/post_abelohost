@@ -1,0 +1,59 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use app\components\Migrator;
+use app\components\MysqlDatabase;
+
+function usage(): void
+{
+    echo 'Usage: php bin/migrate <command> [args]' . PHP_EOL;
+    echo 'Commands:' . PHP_EOL;
+    echo '  up            Apply all pending migrations' . PHP_EOL;
+    echo '  down [steps]  Rollback last N migrations (default: 1)' . PHP_EOL;
+    echo '  status        Show migration list' . PHP_EOL;
+}
+
+$command = $argv[1] ?? 'help';
+
+try {
+    $migrator = new Migrator(MysqlDatabase::fromEnv()->connect(), __DIR__ . '/../migrations');
+
+    switch ($command) {
+        case 'up':
+            $applied = $migrator->migrate();
+
+            if ($applied === []) {
+                echo 'No pending migrations.' . PHP_EOL;
+            }
+
+            foreach ($applied as $name) {
+                echo "Applied: {$name}" . PHP_EOL;
+            }
+            break;
+        case 'down':
+            $steps = max(1, (int) ($argv[2] ?? 1));
+            $rolledBack = $migrator->rollback($steps);
+
+            if ($rolledBack === []) {
+                echo 'Nothing to rollback.' . PHP_EOL;
+            }
+
+            foreach ($rolledBack as $name) {
+                echo "Rolled back: {$name}" . PHP_EOL;
+            }
+            break;
+        case 'status':
+            foreach ($migrator->status() as $item) {
+                printf('%s %s' . PHP_EOL, $item['applied'] ? '[x]' : '[ ]', $item['name']);
+            }
+            break;
+        default:
+            usage();
+    }
+} catch (Throwable $e) {
+    echo 'Error: ' . $e->getMessage() . PHP_EOL;
+
+    exit(1);
+}
