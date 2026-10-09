@@ -46,7 +46,7 @@ class Router
                 continue;
             }
 
-            echo call_user_func_array($route['handler'], $params);
+            echo $this->call($route['handler'], $params);
             return;
         }
 
@@ -59,6 +59,59 @@ class Router
 
         http_response_code(404);
         echo ($this->notFoundHandler)($path);
+    }
+
+    /**
+     * @param array<string, string> $params
+     */
+    private function call(callable $handler, array $params): mixed
+    {
+        $closure = $handler instanceof Closure ? $handler : Closure::fromCallable($handler);
+        $reflection = new ReflectionFunction($closure);
+        $arguments = [];
+        $used = [];
+
+        foreach ($reflection->getParameters() as $parameter) {
+            if (array_key_exists($parameter->getName(), $params)) {
+                $used[$parameter->getName()] = true;
+                $arguments[] = $params[$parameter->getName()];
+                continue;
+            }
+
+            if ($parameter->isDefaultValueAvailable()) {
+                $arguments[] = $parameter->getDefaultValue();
+                continue;
+            }
+
+            $leftover = array_diff_key($params, $used);
+            $name = array_key_first($leftover);
+            if ($name !== null) {
+                $used[$name] = true;
+                $arguments[] = $params[$name];
+                continue;
+            }
+
+            throw new RuntimeException(sprintf(
+                'Route handler %s requires missing argument $%s',
+                $this->describe($handler),
+                $parameter->getName()
+            ));
+        }
+
+        return $closure(...$arguments);
+    }
+
+    private function describe(callable $handler): string
+    {
+        if (is_string($handler)) {
+            return $handler;
+        }
+
+        if (is_array($handler)) {
+            return (is_string($handler[0]) ? $handler[0] : $handler[0]::class) . '::' . $handler[1];
+        }
+
+        return 'closure';
     }
 
     private function normalizePath(string $uri): string
@@ -84,7 +137,21 @@ class Router
      */
     private function match(string $routePath, string $path, array &$params): bool
     {
-        $pattern = preg_replace('#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#', '(?<$1>[^/]+)', $routePath);
+        $routePath = $this->normalizeRoutePath($routePath);
+
+        $required = [];
+        preg_match_all('#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^{}]*))?\}#', $routePath, $required, PREG_SET_ORDER);
+
+        $pattern = preg_replace_callback(
+            '#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^{}]*))?\}#',
+            static function (array $matches): string {
+                $regex = ($matches[2] ?? '') !== '' ? $matches[2] : '[^/]+';
+
+                return '(?<' . $matches[1] . '>' . $regex . ')';
+            },
+            $routePath
+        );
+
         $pattern = '#^' . $pattern . '$#D';
 
         if (!preg_match($pattern, $path, $matches)) {
@@ -93,6 +160,20 @@ class Router
 
         $params = array_filter($matches, static fn ($key) => is_string($key), ARRAY_FILTER_USE_KEY);
 
+        foreach ($required as $item) {
+            if (($params[$item[1]] ?? '') === '') {
+                return false;
+            }
+        }
+
         return true;
+    }
+
+    private function normalizeRoutePath(string $path): string
+    {
+        $path = preg_replace('#/+#', '/', $path) ?? '/';
+        $path = rtrim($path, '/');
+
+        return $path === '' ? '/' : $path;
     }
 }
