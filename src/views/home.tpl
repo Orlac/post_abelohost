@@ -9,7 +9,10 @@
                     <div class="card-body">
                         <h5 class="card-title">{$category->title|escape}</h5>
                         <p class="card-text text-muted small">{$category->description|escape}</p>
-                        <p class="card-text"><small class="text-muted">ID: {$category->id}</small></p>
+                        <p class="card-text">
+                            <small class="text-muted">ID: {$category->id}</small>
+                            <span class="badge badge-secondary ml-2">{$category->articlesCount} статей</span>
+                        </p>
                     </div>
                 </div>
             </div>

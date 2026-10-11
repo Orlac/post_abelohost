@@ -53,10 +53,10 @@ class Storage
         $statement = $this->pdo()
             ->prepare(
                 <<< SQL
-                SELECT c.*, latest.last_created
+                SELECT c.*, latest.last_created, latest.articles_count
                 FROM categories AS c
                 inner JOIN (
-                    SELECT arl.cid, MAX(a.created_at) AS last_created
+                    SELECT arl.cid, MAX(a.created_at) AS last_created, COUNT(*) AS articles_count
                     FROM articles AS a
                     INNER JOIN article_category_link AS arl ON a.id = arl.aid
                     GROUP BY arl.cid
