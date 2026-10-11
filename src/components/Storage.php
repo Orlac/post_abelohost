@@ -48,31 +48,38 @@ class Storage
      * Достает все категории, отсортированные по последней добавленной/измененной статье
      * @return Category[]
      */
-    public function getCategories($id): array
+    public function getCategories(): array
     {
         $statement = $this->pdo()
             ->prepare(
-                'SELECT c.*
-                 FROM categories c
-                 LEFT JOIN (
-                     SELECT l.cid AS cid, MAX(COALESCE(a.updated_at, a.created_at)) AS latest
-                     FROM article_category_link l
-                     JOIN articles a ON a.id = l.aid
-                     GROUP BY l.cid
-                 ) la ON la.cid = c.id
-                 ORDER BY la.latest IS NULL, la.latest DESC, c.id ASC'
+                <<< SQL
+                SELECT c.*, latest.last_created
+                FROM categories AS c
+                inner JOIN (
+                    SELECT arl.cid, MAX(a.created_at) AS last_created
+                    FROM articles AS a
+                    INNER JOIN article_category_link AS arl ON a.id = arl.aid
+                    GROUP BY arl.cid
+                ) AS latest ON c.id = latest.cid
+                ORDER BY latest.last_created DESC
+                SQL
             );
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        $categories = [];
-        foreach ($rows as $row) {
-            $categories[] = Category::fromRow($row);
-        }
-
-        return $categories;
+        return array_map(fn(array $row) => Category::fromRow($row), $rows);
     }
 
+    /**
+     * Последнии добавленные $count статьи
+     * @param int $count
+     * @param int $cid // id категории
+     * @return void
+     */
+    public function getLatestPosts(int $count = 3, int $cid = null): array
+    {
+
+    }
 
 
     private function pdo(): PDO
