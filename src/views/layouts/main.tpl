@@ -2,29 +2,45 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
-    <title>{$title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
     <style>
-        body { font-family: system-ui, sans-serif; background: #f4f6fb; color: #222;
-               display: flex; flex-direction: column; align-items: center; margin-top: 8vh; }
-        nav { margin-bottom: 24px; }
-        nav a { margin: 0 10px; color: #4f46e5; text-decoration: none; }
-        nav a:hover { text-decoration: underline; }
-        img { width: 220px; height: 220px; }
+        body { background: #f4f6fb; }
+        .navbar-brand { font-weight: 600; }
+        .navbar-nav .nav-link { color: #4f46e5; font-weight: 500; }
+        .navbar-nav .nav-link:hover { color: #3b34a8; }
+        main { flex: 1; }
+        .logo { width: 220px; height: 220px; display: block; margin: 0 auto 1rem; }
         small { color: #666; }
         code { background: #eef2ff; border-radius: 4px; padding: 2px 6px; }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="/">Главная</a>
-        <a href="/info">Info</a>
-        <a href="/health">Health</a>
-    </nav>
+<nav class="navbar navbar-expand-md navbar-light bg-light border-bottom">
+    <div class="container">
+        <a class="navbar-brand" href="/">Post App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/info">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/health">Health</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container my-5">
     <main>
         {$content}
     </main>
+</div>
 </body>
 </html>
