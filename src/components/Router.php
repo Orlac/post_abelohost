@@ -55,19 +55,25 @@ class Router
                 continue;
             }
 
-            echo $this->call($route['handler'], $params);
+            $result = $this->call($route['handler'], $params);
+
+            if ($result instanceof Response) {
+                $result->send();
+                return;
+            }
+
+            echo $result;
             return;
         }
 
         if ($allowed !== []) {
-            http_response_code(405);
-            header('Allow: ' . implode(', ', array_unique($allowed)));
-            echo ($this->methodNotAllowedHandler)($path);
+            Response::html(($this->methodNotAllowedHandler)($path), 405)
+                ->setHeader('Allow', implode(', ', array_unique($allowed)))
+                ->send();
             return;
         }
 
-        http_response_code(404);
-        echo ($this->notFoundHandler)($path);
+        Response::html(($this->notFoundHandler)($path), 404)->send();
     }
 
     /**
