@@ -5,16 +5,18 @@
     <div class="row">
         {foreach $categories as $category}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{$category->title|escape}</h5>
-                        <p class="card-text text-muted small">{$category->description|escape}</p>
-                        <p class="card-text">
-                            <small class="text-muted">ID: {$category->id}</small>
-                            <span class="badge badge-secondary ml-2">{$category->articlesCount} статей</span>
-                        </p>
+                <a href="{$router->url('category', ['id' => $category->id])}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{$category->title|escape}</h5>
+                            <p class="card-text text-muted small">{$category->description|escape}</p>
+                            <p class="card-text">
+                                <small class="text-muted">ID: {$category->id}</small>
+                                <span class="badge badge-secondary ml-2">{$category->articlesCount} статей</span>
+                            </p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         {/foreach}
     </div>

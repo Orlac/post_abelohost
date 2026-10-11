@@ -92,6 +92,27 @@ class Storage
     }
 
     /**
+     * Достает статьи, относящиеся к категории
+     * @param int $cid
+     * @return Article[]
+     */
+    public function getArticlesByCategory(int $cid): array
+    {
+        $statement = $this->pdo()
+            ->prepare(
+                'SELECT a.*
+                 FROM articles a
+                 INNER JOIN article_category_link l ON l.aid = a.id
+                 WHERE l.cid = ?
+                 ORDER BY a.created_at DESC'
+            );
+        $statement->execute([$cid]);
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(Article::class . '::fromRow', $rows);
+    }
+
+    /**
      * Последние добавленные $count статьи
      * @param int $count
      * @param ?int $cid // id категории
