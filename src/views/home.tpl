@@ -18,6 +18,9 @@
             </div>
         {/foreach}
     </div>
+    <p class="mt-3">
+        <a href="{$router->url('home')}" class="text-decoration-none">← Назад ко всем статьям</a>
+    </p>
 {else}
     <p class="text-muted">Категории отсутствуют.</p>
 {/if}

@@ -10,6 +10,15 @@ class View
     public string $templateDir = __DIR__ . '/../views/';
     public string $layout = 'layouts/main.tpl';
 
+    public ?Router $router = null;
+
+    public function setRouter(Router $router): self
+    {
+        $this->router = $router;
+
+        return $this;
+    }
+
     public string $compileDir;
     public string $cacheDir;
 
@@ -34,6 +43,10 @@ class View
     {
         foreach ($params as $key => $value) {
             $this->smarty->assign($key, $value);
+        }
+
+        if ($this->router !== null) {
+            $this->smarty->assign('router', $this->router);
         }
 
         $content = $this->smarty->fetch($view);

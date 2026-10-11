@@ -23,11 +23,11 @@
     <div class="mt-4">
         <strong>Категории:</strong>
         {foreach $categories as $category}
-            <a href="/" class="badge badge-primary mr-1">{$category->title|escape}</a>
+            <a href="{$router->url('home')}" class="badge badge-primary mr-1">{$category->title|escape}</a>
         {/foreach}
     </div>
 {/if}
 
 <p class="mt-4 text-muted">
-    <a href="/" class="text-decoration-none">← Назад ко всем статьям</a>
+    <a href="{$router->url('home')}" class="text-decoration-none">← Назад ко всем статьям</a>
 </p>

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace app\components;
 
 use Closure;
@@ -11,7 +12,7 @@ use RuntimeException;
 
 class Router
 {
-    /** @var list<array{method: string, path: string, handler: callable}> */
+    /** @var list<array{method: string, path: string, name: ?string, handler: callable}> */
     private array $routes = [];
 
     public function __construct(
@@ -20,23 +21,41 @@ class Router
     ) {
     }
 
-    public function get(string $path, callable $handler): void
+    public function get(string $path, callable $handler, ?string $name = null): void
     {
-        $this->add('GET', $path, $handler);
+        $this->add('GET', $path, $handler, $name);
     }
 
-    public function post(string $path, callable $handler): void
+    public function post(string $path, callable $handler, ?string $name = null): void
     {
-        $this->add('POST', $path, $handler);
+        $this->add('POST', $path, $handler, $name);
     }
 
-    public function add(string $method, string $path, callable $handler): void
+    public function add(string $method, string $path, callable $handler, ?string $name = null): void
     {
         $this->routes[] = [
             'method' => strtoupper($method),
             'path' => $path,
+            'name' => $name,
             'handler' => $handler,
         ];
+    }
+
+    /**
+     * Build a URL for a named route, substituting the given params into placeholders.
+     * @param array<string, string|int> $params
+     */
+    public function url(string $name, array $params = []): string
+    {
+        foreach ($this->routes as $route) {
+            if ($route['name'] === null || $route['name'] !== $name) {
+                continue;
+            }
+
+            return $this->buildPath($route['path'], $params);
+        }
+
+        throw new RuntimeException("Route not found: {$name}");
     }
 
     public function dispatch(string $method, string $uri): void
@@ -145,6 +164,28 @@ class Router
         $path = rtrim($path, '/');
 
         return $path === '' ? '/' : $path;
+    }
+
+    /**
+     * @param array<string, string|int> $params
+     */
+    private function buildPath(string $routePath, array $params): string
+    {
+        $path = preg_replace_callback(
+            '#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^{}]*))?\}#',
+            static function (array $matches) use ($params): string {
+                $name = $matches[1];
+
+                if (!array_key_exists($name, $params)) {
+                    throw new RuntimeException("Missing route parameter: {$name}");
+                }
+
+                return rawurlencode((string) $params[$name]);
+            },
+            $routePath
+        );
+
+        return $path;
     }
 
     /**
