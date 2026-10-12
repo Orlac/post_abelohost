@@ -19,20 +19,20 @@
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-light border-bottom">
     <div class="container">
-        <a class="navbar-brand" href="/">Post App</a>
+        <a class="navbar-brand" href="{$router->url('home')}">Post App</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Главная</a>
+                    <a class="nav-link" href="{$router->url('home')}">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/info">Info</a>
+                    <a class="nav-link" href="{$router->url('info')}">Info</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/health">Health</a>
+                    <a class="nav-link" href="{$router->url('health')}">Health</a>
                 </li>
             </ul>
         </div>

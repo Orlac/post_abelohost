@@ -17,14 +17,12 @@
             <a href="{$router->url('home')}" class="badge badge-primary">← Все категории</a>
         </p>
 
-        <form class="form-inline mt-3" method="get">
+        <form class="form-inline mt-3" method="get" action="{$router->url('category', ['id' => $category->id, 'sort' => $sort, 'page' => $pager->getCurrentPage()])}">
             <label class="mr-2 text-muted small" for="sortSelect">Сортировка статей:</label>
             <select name="sort" id="sortSelect" class="form-control form-control-sm" onchange="this.form.submit()">
                 <option value="created_at" {if $sort === 'created_at'}selected="selected"{/if}>По дате создания (новые)</option>
                 <option value="views" {if $sort === 'views'}selected="selected"{/if}>По просмотрам</option>
             </select>
-            <input type="hidden" name="id" value="{$category->id}">
-            <input type="hidden" name="page" value="{$pager->getCurrentPage()}">
         </form>
     </div>
 </div>
@@ -57,19 +55,19 @@
             <ul class="pagination justify-content-center">
                 {if $pager->hasPrev()}
                     <li class="page-item">
-                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$prevPage}">←</a>
+                        <a class="page-link" href="{$router->url('category', ['id' => $category->id, 'sort' => $sort, 'page' => $prevPage])}">←</a>
                     </li>
                 {/if}
 
                 {for $i=1 to $pager->getTotalPages()}
                     <li class="page-item {if $i === $pager->getCurrentPage()}active{/if}">
-                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$i}">{$i}</a>
+                        <a class="page-link" href="{$router->url('category', ['id' => $category->id, 'sort' => $sort, 'page' => $i])}">{$i}</a>
                     </li>
                 {/for}
 
                 {if $pager->hasNext()}
                     <li class="page-item">
-                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$nextPage}">→</a>
+                        <a class="page-link" href="{$router->url('category', ['id' => $category->id, 'sort' => $sort, 'page' => $nextPage])}">→</a>
                     </li>
                 {/if}
             </ul>
