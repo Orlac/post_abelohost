@@ -15,12 +15,6 @@ class Router
     /** @var list<array{method: string, path: string, name: ?string, handler: callable}> */
     private array $routes = [];
 
-    public function __construct(
-        private readonly Closure $notFoundHandler,
-        private readonly Closure $methodNotAllowedHandler
-    ) {
-    }
-
     public function get(string $path, callable $handler, ?string $name = null): void
     {
         $this->add('GET', $path, $handler, $name);

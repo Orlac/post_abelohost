@@ -27,7 +27,7 @@ class ArticlesController
         ]);
     }
 
-    public function article(int $id): string|Response
+    public function article(int $id): string
     {
         /** @var Storage $storage */
         $storage = Container::get(Storage::class);
@@ -38,11 +38,6 @@ class ArticlesController
 
         if ($article === null) {
             throw new AppException('Статья не найдена', 404);
-            // $title = 'Статья не найдена';
-            // return Response::html($view->render('home.tpl', [
-            //     'title' => $title,
-            //     'categories' => [],
-            // ]), 404);
         }
 
         $title = (string) getenv('NAME_APP') . ' / ' . $article->title;
@@ -56,7 +51,7 @@ class ArticlesController
         ]);
     }
 
-    public function category(int $id): string|Response
+    public function category(int $id): string
     {
         /** @var Storage $storage */
         $storage = Container::get(Storage::class);

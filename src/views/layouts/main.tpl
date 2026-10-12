@@ -31,9 +31,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{$router->url('info')}">Info</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{$router->url('health')}">Health</a>
-                </li>
             </ul>
         </div>
     </div>
