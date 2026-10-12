@@ -82,20 +82,4 @@ class Response
             ->setHeader('Content-Type', 'text/html; charset=utf-8')
             ->setContent($content);
     }
-
-    public static function json(mixed $data, int $statusCode = 200): self
-    {
-        return (new self())
-            ->setStatusCode($statusCode)
-            ->setHeader('Content-Type', 'application/json; charset=utf-8')
-            ->setContent((string) json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-    }
-
-    public static function redirect(string $url, int $statusCode = 302): self
-    {
-        return (new self())
-            ->setStatusCode($statusCode)
-            ->setHeader('Location', $url)
-            ->setContent('');
-    }
 }

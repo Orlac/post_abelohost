@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\Controllers;
 
+use app\components\AppException;
 use app\components\Container;
 use app\components\Pager;
 use app\components\Request;
@@ -36,11 +37,12 @@ class ArticlesController
         $article = $storage->getArticle($id);
 
         if ($article === null) {
-            $title = 'Статья не найдена';
-            return Response::html($view->render('home.tpl', [
-                'title' => $title,
-                'categories' => [],
-            ]), 404);
+            throw new AppException('Статья не найдена', 404);
+            // $title = 'Статья не найдена';
+            // return Response::html($view->render('home.tpl', [
+            //     'title' => $title,
+            //     'categories' => [],
+            // ]), 404);
         }
 
         $title = (string) getenv('NAME_APP') . ' / ' . $article->title;

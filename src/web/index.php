@@ -1,8 +1,10 @@
 <?php
 
 declare(strict_types=1);
+use app\components\AppException;
 use app\components\Container;
 use app\components\DatabaseInterface;
+use app\components\ErrorHandler;
 use app\components\MysqlDatabase;
 use app\components\Request;
 use app\components\Response;
@@ -21,7 +23,7 @@ $database = Container::get(DatabaseInterface::class);
 
 $router = new Router(
     Closure::fromCallable('pageNotFound'),
-    Closure::fromCallable('pageMethodNotAllowed')
+    Closure::fromCallable('pageMethodNotAllowed'),
 );
 
 Container::set(Router::class, static fn () => $router);
@@ -51,4 +53,13 @@ $router->get('/category/{id:(\d+)}/', function (string $id): string|Response {
 $router->get('/info', 'pageInfo', 'info');
 $router->get('/health', static fn (): string => pageHealth($database), 'health');
 
-$router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+// try {
+    $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+// } catch (AppException $ex) {
+//     /**
+//      * @var ErrorHandler $handler
+//      */
+//     $handler = Container::get(ErrorHandler::class);
+//     echo $handler->renderError($ex);
+// }
+
