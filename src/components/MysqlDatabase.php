@@ -27,6 +27,17 @@ class MysqlDatabase implements DatabaseInterface
             (string) getenv('DB_PASSWORD')
         );
     }
+    
+    public static function fromRootEnv(): self
+    {
+        return new self(
+            (string) getenv('DB_HOST'),
+            (string) getenv('DB_PORT'),
+            (string) getenv('DB_DATABASE'),
+            'root',
+            (string) getenv('DB_ROOT_PASSWORD')
+        );
+    }
 
     public function connect(): PDO
     {

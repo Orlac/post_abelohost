@@ -16,7 +16,7 @@ class Version20261009213300CreateCategoriesTable extends Migration
                 `description` varchar(511) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
                 `created_at` datetime NOT NULL,
                 `updated_at` datetime DEFAULT NULL ON UPDATE NOW(),
-                `last_article_created_at` datetime DEFAULT NULL 'Дата создания последней добавленной статьи в эту категорию',
+                `last_article_created_at` datetime DEFAULT NULL COMMENT 'Дата создания последней добавленной статьи в эту категорию',
                 `last_article_ids` json DEFAULT NULL COMMENT 'id последних 10 добавленных статей в эту категорию в порядке убывания created_at',
                 PRIMARY KEY (`id`),
                 KEY `last_article_created_at` (`last_article_created_at`)

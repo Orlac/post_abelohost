@@ -20,7 +20,8 @@ function usage(): void
 $command = $argv[1] ?? 'help';
 
 try {
-    $migrator = new Migrator(MysqlDatabase::fromEnv()->connect(), __DIR__ . '/../migrations');
+    $migrationDb = MysqlDatabase::fromRootEnv();
+    $migrator = new Migrator($migrationDb->connect(), __DIR__ . '/../migrations');
 
     switch ($command) {
         case 'up':

@@ -12,6 +12,7 @@ final class Category
         public readonly string $description,
         public readonly string $createdAt,
         public readonly ?string $updatedAt = null,
+        public readonly ?string $lastArticleCreatedAt = null,
         public readonly int $articlesCount = 0,
     ) {
     }
@@ -26,6 +27,7 @@ final class Category
             title: (string) $row['title'],
             description: (string) $row['description'],
             createdAt: (string) $row['created_at'],
+            lastArticleCreatedAt: (string) $row['last_article_created_at'],
             updatedAt: isset($row['updated_at']) ? (string) $row['updated_at'] : null,
             articlesCount: isset($row['articles_count']) ? (int) $row['articles_count'] : 0,
         );
