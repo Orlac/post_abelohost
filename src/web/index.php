@@ -56,6 +56,10 @@ $router->get('/health', static fn (): string => pageHealth($database), 'health')
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 } catch (AppException $ex) {
+    /** @var Response $response */
+    $response = Container::get(Response::class);
+    $response->setStatusCode($ex->getCode())
+        ->send();
     /**
      * @var ErrorHandler $handler
      */

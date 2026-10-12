@@ -70,11 +70,7 @@ class ArticlesController
         $category = $storage->getCategory($id);
 
         if ($category === null) {
-            $title = 'Категория не найдена';
-            return Response::html($view->render('home.tpl', [
-                'title' => $title,
-                'categories' => [],
-            ]), 404);
+            throw new AppException('Категория не найдена', 404);
         }
 
         $title = (string) getenv('NAME_APP') . ' / ' . $category->title;

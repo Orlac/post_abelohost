@@ -67,19 +67,4 @@ class Response
         echo $this->content;
     }
 
-    public static function text(string $content, int $statusCode = 200): self
-    {
-        return (new self())
-            ->setStatusCode($statusCode)
-            ->setHeader('Content-Type', 'text/plain; charset=utf-8')
-            ->setContent($content);
-    }
-
-    public static function html(string $content, int $statusCode = 200): self
-    {
-        return (new self())
-            ->setStatusCode($statusCode)
-            ->setHeader('Content-Type', 'text/html; charset=utf-8')
-            ->setContent($content);
-    }
 }

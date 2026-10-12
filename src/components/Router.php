@@ -64,35 +64,32 @@ class Router
         $path = $this->normalizePath($uri);
         $allowed = [];
 
-            foreach ($this->routes as $route) {
-                $params = [];
-                if (!$this->match($route['path'], $path, $params)) {
-                    continue;
-                }
-                if ($route['method'] !== $method) {
-                    $allowed[] = $route['method'];
-                    continue;
-                }
+        foreach ($this->routes as $route) {
+            $params = [];
+            if (!$this->match($route['path'], $path, $params)) {
+                continue;
+            }
+            if ($route['method'] !== $method) {
+                $allowed[] = $route['method'];
+                continue;
+            }
 
-                $result = $this->call($route['handler'], $params);
+            $result = $this->call($route['handler'], $params);
 
-                if ($result instanceof Response) {
-                    $result->send();
-                    return;
-                }
-
-                echo $result;
+            if ($result instanceof Response) {
+                $result->send();
                 return;
             }
 
-        if ($allowed !== []) {
-            Response::html(($this->methodNotAllowedHandler)($path), 405)
-                ->setHeader('Allow', implode(', ', array_unique($allowed)))
-                ->send();
+            echo $result;
             return;
         }
 
-        Response::html(($this->notFoundHandler)($path), 404)->send();
+        if ($allowed !== []) {
+            throw new AppException('Method not alloed', 405);
+        }
+
+        throw new AppException('Page not found', 404);
     }
 
     /**
