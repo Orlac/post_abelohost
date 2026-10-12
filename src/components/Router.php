@@ -168,6 +168,14 @@ class Router
      */
     private function buildPath(string $routePath, array $params): string
     {
+        // Извлекаем имена placeholder'ов из пути маршрута
+        $placeholderNames = [];
+        preg_match_all('#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^{}]*))?\}#', $routePath, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $placeholderNames[] = $match[1];
+        }
+
+        // Подставляем path placeholder'ы
         $path = preg_replace_callback(
             '#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^{}]*))?\}#',
             static function (array $matches) use ($params): string {
@@ -181,6 +189,13 @@ class Router
             },
             $routePath
         );
+
+        // Оставшиеся параметры превращаем в query string
+        $queryParams = array_diff_key($params, array_flip($placeholderNames));
+        if (!empty($queryParams)) {
+            $queryString = http_build_query($queryParams);
+            $path .= '?' . $queryString;
+        }
 
         return $path;
     }
