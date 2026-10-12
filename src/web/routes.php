@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+use app\components\DatabaseInterface;
+
 function layout(string $title, string $content): string
 {
     return sprintf(
