@@ -180,32 +180,6 @@ class Storage
         return $pager;
     }
 
-    /**
-     * Последние добавленные $count статьи
-     * @param int $count
-     * @param ?int $cid // id категории
-     * @return Article[]
-     */
-    public function getLatestPosts(int $count = 3, ?int $cid = null): array
-    {
-        $sql = 'SELECT * FROM articles';
-
-        $params = [];
-
-        if ($cid !== null) {
-            $sql .= ' WHERE id IN (SELECT aid FROM article_category_link WHERE cid = ?)';
-            $params[] = $cid;
-        }
-
-        $sql .= ' ORDER BY created_at DESC LIMIT ' . $count;
-
-        $statement = $this->pdo()->prepare($sql);
-        $statement->execute($params);
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        return array_map(fn(array $row) => Article::fromRow($row), $rows);
-    }
-
     private function pdo(): PDO
     {
         return $this->db->connect();
