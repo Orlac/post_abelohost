@@ -14,6 +14,7 @@ function usage(): void
     echo '  up            Apply all pending migrations' . PHP_EOL;
     echo '  down [steps]  Rollback last N migrations (default: 1)' . PHP_EOL;
     echo '  status        Show migration list' . PHP_EOL;
+    echo '  create <name> Create new migration file' . PHP_EOL;
 }
 
 $command = $argv[1] ?? 'help';
@@ -50,6 +51,16 @@ try {
                 printf('%s %s' . PHP_EOL, $item['applied'] ? '[x]' : '[ ]', $item['name']);
             }
             break;
+        case 'create':
+            $name = $argv[2] ?? '';
+            if ($name === '') {
+                echo 'Error: Migration name required.' . PHP_EOL;
+                echo 'Usage: php bin/migrate create <name>' . PHP_EOL;
+                exit(1);
+            }
+            $created = createMigration($name, __DIR__ . '/../migrations');
+            echo "Created: {$created}" . PHP_EOL;
+            break;
         default:
             usage();
     }
@@ -57,4 +68,51 @@ try {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
 
     exit(1);
+}
+
+function createMigration(string $name, string $dir): string
+{
+    $timestamp = date('YmdHis');
+    $className = 'Version' . $timestamp . '_' . ucfirst(str_replace(['-', '_'], '', $name));
+    $fileName = $className . '.php';
+    $path = $dir . '/' . $fileName;
+
+    // Convert name to snake_case table name
+    $table = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ucfirst(str_replace(['-', '_'], '', $name))));
+    $table = strtolower($name); // Simple: just use the name as-is in lowercase
+
+    $content = <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+namespace app\migrations;
+
+use app\components\Migration;
+
+class %s extends Migration
+{
+    public function up(): void
+    {
+        $this->db->exec(
+            <<<SQL
+            
+            SQL
+        );
+    }
+
+    public function down(): void
+    {
+        $this->db->exec(<<<SQL
+            
+            SQL);
+    }
+}
+PHP;
+
+    $content = sprintf($content, $className, $table, $table);
+
+    file_put_contents($path, $content);
+
+    return $fileName;
 }
