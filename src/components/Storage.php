@@ -108,26 +108,29 @@ class Storage
     /**
      * Достает статьи, относящиеся к категории
      * @param int $cid
-     * @param string $sort 'created_at' | 'views'
-     * @return Article[]
+     * @param string $sort
+     * @param int $page
+     * @param int $pageSize
+     * @return Pager
      */
-    public function getArticlesByCategory(int $cid, string $sort = 'created_at'): array
+    public function getArticlesByCategory(int $cid, string $sort = 'created_at', int $page = 1, int $pageSize = 9): Pager
     {
         $order = $sort === 'views' ? 'a.views DESC' : 'a.created_at DESC';
+        $sql = <<< SQL
+            SELECT a.*
+            FROM articles a
+            INNER JOIN article_category_link l ON l.aid = a.id
+            WHERE l.cid = {$cid}
+            ORDER BY {$order}
+            SQL;
 
-        $statement = $this->pdo()
-            ->prepare(<<< SQL
-                SELECT a.*
-                FROM articles a
-                INNER JOIN article_category_link l ON l.aid = a.id
-                WHERE l.cid = ?
-                ORDER BY {$order}
-                SQL
-            );
-        $statement->execute([$cid]);
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        /** @var Pager $pager */
+        $pager = Container::get(Pager::class);
+        $pager->paginate($sql, $page, $pageSize);
 
-        return array_map(fn(array $row) => Article::fromRow($row), $rows);
+        $pager->setItems(array_map(fn(array $row) => Article::fromRow($row), $pager->getItems()));
+
+        return $pager;
     }
 
     /**

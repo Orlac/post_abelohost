@@ -24,12 +24,13 @@
                 <option value="views" {if $sort === 'views'}selected="selected"{/if}>По просмотрам</option>
             </select>
             <input type="hidden" name="id" value="{$category->id}">
+            <input type="hidden" name="page" value="{$pager->getCurrentPage()}">
         </form>
     </div>
 </div>
 
 {if $articles}
-    <h4 class="mb-3">Статьи в этой категории ({$articles|count})</h4>
+    <h4 class="mb-3">Статьи в этой категории ({$pager->getTotal()})</h4>
     <div class="row">
         {foreach $articles as $article}
             <div class="col-md-6 col-lg-4 mb-4">
@@ -50,6 +51,30 @@
             </div>
         {/foreach}
     </div>
+
+    {if $pager->getTotalPages() > 1}
+        <nav aria-label="Страницы категории" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {if $pager->hasPrev()}
+                    <li class="page-item">
+                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$prevPage}">←</a>
+                    </li>
+                {/if}
+
+                {for $i=1 to $pager->getTotalPages()}
+                    <li class="page-item {if $i === $pager->getCurrentPage()}active{/if}">
+                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$i}">{$i}</a>
+                    </li>
+                {/for}
+
+                {if $pager->hasNext()}
+                    <li class="page-item">
+                        <a class="page-link" href="?id={$category->id}&sort={$sort}&page={$nextPage}">→</a>
+                    </li>
+                {/if}
+            </ul>
+        </nav>
+    {/if}
 {else}
     <div class="alert alert-info">
         В этой категории пока нет статей.

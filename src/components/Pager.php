@@ -59,6 +59,12 @@ class Pager
     {
         return $this->items;
     }
+    
+    public function setItems(array $items): static
+    {
+        $this->items = $items;
+        return $this;
+    }
 
     public function getCurrentPage(): int
     {

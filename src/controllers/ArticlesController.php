@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\Controllers;
 
 use app\components\Container;
+use app\components\Pager;
 use app\components\Request;
 use app\components\Response;
 use app\components\Storage;
@@ -59,6 +60,8 @@ class ArticlesController
         $storage = Container::get(Storage::class);
         /** @var Request $request */
         $request = Container::get(Request::class);
+        /** @var Pager $pager */
+        $pager = Container::get(Pager::class);
         /** @var View $view */
         $view = Container::get(View::class);
 
@@ -75,13 +78,22 @@ class ArticlesController
         $title = (string) getenv('NAME_APP') . ' / ' . $category->title;
 
         $sort = (string) $request->getQuery('sort', 'created_at');
-        $articles = $storage->getArticlesByCategory($id, $sort);
+        $page = max(1, (int) $request->getQuery('page', 1));
+
+        $pager = $storage->getArticlesByCategory(
+            cid: $id,
+            sort: $sort,
+            page: $page
+        );
 
         return $view->render('category.tpl', [
             'title' => $title,
             'category' => $category,
-            'articles' => $articles,
+            'articles' => $pager->getItems(),
             'sort' => $sort,
+            'pager' => $pager,
+            'prevPage' => $pager->getCurrentPage() - 1,
+            'nextPage' => $pager->getCurrentPage() + 1,
         ]);
     }
 }
