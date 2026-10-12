@@ -9,10 +9,10 @@ use app\components\Request;
 use app\components\Router;
 use app\components\View;
 
-Container::set(DatabaseInterface::class, static fn (): DatabaseInterface => MysqlDatabase::fromEnv());
+Container::set(DatabaseInterface::class, fn (): DatabaseInterface => MysqlDatabase::fromEnv());
 
 $database = Container::get(DatabaseInterface::class);
 
 $router = Container::get(Router::class);
-Container::set(View::class, static fn () => (new View())->setRouter($router));
-Container::set(Pager::class, static fn () => new Pager(Container::get(DatabaseInterface::class)));
+Container::set(View::class, fn () => (new View())->setRouter($router));
+Container::set(Pager::class, fn () => new Pager(Container::get(DatabaseInterface::class)));

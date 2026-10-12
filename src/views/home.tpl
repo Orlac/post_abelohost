@@ -1,28 +1,35 @@
-<img class="logo" alt="Логотип" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' rx='36' fill='%234f46e5'/><path d='M40 70l60 45 60-45v70a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10z' fill='white'/><path d='M40 60a10 10 0 0 1 10-10h100a10 10 0 0 1 10 10l-60 45z' fill='%23c7d2fe'/></svg>">
-<h1 class="text-center mb-4">Привет! Приложение запущено 🚀</h1>
-
 {if $categories}
     <div class="row">
         {foreach $categories as $category}
             <div class="col-md-6 col-lg-4 mb-4">
-                <a href="{$router->url('category', ['id' => $category->id])}" class="text-decoration-none">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <a href="{$router->url('category', ['id' => $category->id])}" class="text-decoration-none">
                             <h5 class="card-title">{$category->title|escape}</h5>
                             <p class="card-text text-muted small">{$category->description|escape}</p>
                             <p class="card-text">
                                 <small class="text-muted">ID: {$category->id}</small>
                                 <span class="badge badge-secondary ml-2">{$category->articlesCount} статей</span>
                             </p>
-                        </div>
+                        </a>
+                        
+                        {if $category->lastArticles}
+                            <div class="mt-2">
+                                <small class="text-muted">Последние статьи:</small>
+                                {foreach $category->lastArticles as $article}
+                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                        <a href="{$router->url('article', ['id' => $article->id])}" class="badge badge-secondary text-decoration-none">
+                                        {$article->title|escape|truncate:50}
+                                        </a>
+                                    </div>
+                                {/foreach}
+                            </div>
+                        {/if}
                     </div>
-                </a>
+                </div>
             </div>
         {/foreach}
     </div>
-    <p class="mt-3">
-        <a href="{$router->url('home')}" class="text-decoration-none">← Назад ко всем статьям</a>
-    </p>
 {else}
     <p class="text-muted">Категории отсутствуют.</p>
 {/if}
