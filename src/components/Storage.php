@@ -37,7 +37,13 @@ class Storage
     public function getCategory(int $id): ?Category
     {
         $statement = $this->pdo()
-            ->prepare('SELECT * FROM categories WHERE id = ?');
+            ->prepare(
+                'SELECT c.*, count(arl.aid) as articles_count
+                 FROM categories c
+                 LEFT JOIN article_category_link as arl on arl.cid=c.id
+                 WHERE c.id = ?
+                group by c.id'
+            );
         $statement->execute([$id]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -94,17 +100,20 @@ class Storage
     /**
      * Достает статьи, относящиеся к категории
      * @param int $cid
+     * @param string $sort 'created_at' | 'views'
      * @return Article[]
      */
-    public function getArticlesByCategory(int $cid): array
+    public function getArticlesByCategory(int $cid, string $sort = 'created_at'): array
     {
+        $order = $sort === 'views' ? 'a.views DESC' : 'a.created_at DESC';
+
         $statement = $this->pdo()
             ->prepare(
-                'SELECT a.*
+                "SELECT a.*
                  FROM articles a
                  INNER JOIN article_category_link l ON l.aid = a.id
                  WHERE l.cid = ?
-                 ORDER BY a.created_at DESC'
+                 ORDER BY {$order}"
             );
         $statement->execute([$cid]);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);

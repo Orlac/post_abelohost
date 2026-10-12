@@ -20,24 +20,24 @@ class Request
     /**
      * @return array<string, mixed>|mixed
      */
-    public function getQuery(?string $param = null): mixed
+    public function getQuery(?string $param = null, mixed $default = null): mixed
     {
         if ($param === null) {
             return $this->query;
         }
 
-        return $this->query[$param] ?? null;
+        return $this->query[$param] ?? $default;
     }
 
     /**
      * @return array<string, mixed>|mixed
      */
-    public function getPost(?string $param = null): mixed
+    public function getPost(?string $param = null, mixed $default = null): mixed
     {
         if ($param === null) {
             return $this->post;
         }
 
-        return $this->post[$param] ?? null;
+        return $this->post[$param] ?? $default;
     }
 }

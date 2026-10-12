@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\Controllers;
 
 use app\components\Container;
+use app\components\Request;
 use app\components\Response;
 use app\components\Storage;
 use app\components\View;
@@ -56,6 +57,8 @@ class ArticlesController
     {
         /** @var Storage $storage */
         $storage = Container::get(Storage::class);
+        /** @var Request $request */
+        $request = Container::get(Request::class);
         /** @var View $view */
         $view = Container::get(View::class);
 
@@ -71,12 +74,14 @@ class ArticlesController
 
         $title = (string) getenv('NAME_APP') . ' / ' . $category->title;
 
-        $articles = $storage->getArticlesByCategory($id);
+        $sort = (string) $request->getQuery('sort', 'created_at');
+        $articles = $storage->getArticlesByCategory($id, $sort);
 
         return $view->render('category.tpl', [
             'title' => $title,
             'category' => $category,
             'articles' => $articles,
+            'sort' => $sort,
         ]);
     }
 }

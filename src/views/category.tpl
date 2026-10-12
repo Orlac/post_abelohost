@@ -16,6 +16,15 @@
         <p class="mt-3">
             <a href="{$router->url('home')}" class="badge badge-primary">← Все категории</a>
         </p>
+
+        <form class="form-inline mt-3" method="get">
+            <label class="mr-2 text-muted small" for="sortSelect">Сортировка статей:</label>
+            <select name="sort" id="sortSelect" class="form-control form-control-sm" onchange="this.form.submit()">
+                <option value="created_at" {if $sort === 'created_at'}selected="selected"{/if}>По дате создания (новые)</option>
+                <option value="views" {if $sort === 'views'}selected="selected"{/if}>По просмотрам</option>
+            </select>
+            <input type="hidden" name="id" value="{$category->id}">
+        </form>
     </div>
 </div>
 
