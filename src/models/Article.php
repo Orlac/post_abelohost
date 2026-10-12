@@ -17,7 +17,7 @@ final class Article
         public readonly int $views,
         public readonly string $createdAt,
         public readonly ?string $updatedAt = null,
-        public readonly array $categoryIds = [],
+        public readonly array $categories = [],
     ) {
     }
 
@@ -35,7 +35,7 @@ final class Article
             views: (int) $row['views'],
             createdAt: (string) $row['created_at'],
             updatedAt: isset($row['updated_at']) ? (string) $row['updated_at'] : null,
-            categoryIds: [],
+            categories: $row['categories'] ?? [],
         );
     }
 }

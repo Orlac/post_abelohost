@@ -29,8 +29,13 @@ class Storage
             );
         $statement->execute([$id]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
+        
+        if ($row) {
+            $row['categories'] = $this->getArticleCategories($id);
+            return Article::fromRow($row);
+        }
 
-        return $row === false ? null : Article::fromRow($row);
+        return null;
     }
 
     /**
@@ -62,25 +67,67 @@ class Storage
      * Достает все категории, отсортированные по последней добавленной статье
      * @return Category[]
      */
-    public function getCategories(): array
+    public function getCategories(int $lastArticlesCount = 3): array
     {
         $statement = $this->pdo()
             ->prepare(<<< SQL
-                SELECT c.*, latest.last_created, latest.articles_count
+                SELECT 
+                    c.*,
+                    count(arl.aid) as articles_count
                 FROM categories AS c
-                inner JOIN (
-                    SELECT arl.cid, MAX(a.created_at) AS last_created, COUNT(*) AS articles_count
-                    FROM articles AS a
-                    INNER JOIN article_category_link AS arl ON a.id = arl.aid
-                    GROUP BY arl.cid
-                ) AS latest ON c.id = latest.cid
-                ORDER BY latest.last_created DESC
-                SQL
-            );
+                INNER JOIN article_category_link as arl on arl.cid=c.id
+                GROUP BY c.id
+                ORDER BY c.last_article_created_at DESC
+            SQL);
+        $statement->execute();
+
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $aids = [];
+
+        foreach ($rows as &$row) {
+            $row['last_article_ids'] = json_decode($row['last_article_ids'], true);
+
+            $row['last_article_ids'] = array_slice($row['last_article_ids'], 0, $lastArticlesCount);
+            $aids = [
+                ...$aids,
+                ...$row['last_article_ids']
+            ];
+        }
+
+        $articlesMap = $this->getMapArticles($aids);
+
+        foreach ($rows as &$row) {
+            $row['last_articles'] = [];
+            foreach ($row['last_article_ids'] as $aid) {
+                $row['last_articles'][] = $articlesMap[$aid];
+            }
+
+            $row = Category::fromRow($row);
+        }
+
+        return $rows;
+    }
+
+    private function getMapArticles(array $ids): array
+    {
+        $idsStr = implode(',', $ids);
+        $statement = $this->pdo()
+            ->prepare(<<< SQL
+                SELECT 
+                    a.*
+                FROM articles AS a
+                WHERE a.id in ({$idsStr})
+            SQL);
+
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $map = [];
 
-        return array_map(fn(array $row) => Category::fromRow($row), $rows);
+        foreach ($rows as $row) {
+            $map[$row['id']] = Article::fromRow($row);
+        }
+
+        return $map;
     }
 
     /**

@@ -56,7 +56,7 @@ class Version20261012142400_Triggers extends Migration
                 read_loop: LOOP
                     FETCH cur INTO v_cid;
                     IF v_done THEN LEAVE read_loop; END IF;
-                    CALL refresh_category_last_articles(v_cid, p_aid);
+                    CALL refresh_category_last_articles(v_cid, p_aid);  -- статья исключается (она удаляется)
                 END LOOP;
                 CLOSE cur;
                 END

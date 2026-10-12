@@ -42,12 +42,9 @@ class ArticlesController
 
         $title = (string) getenv('NAME_APP') . ' / ' . $article->title;
 
-        $categories = $storage->getArticleCategories($id);
-
         return $view->render('article.tpl', [
             'title' => $title,
             'article' => $article,
-            'categories' => $categories,
         ]);
     }
 

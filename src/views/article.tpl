@@ -22,7 +22,7 @@
 {if $categories}
     <div class="mt-4">
         <strong>Категории:</strong>
-        {foreach $categories as $category}
+        {foreach $article->categories as $category}
             <a href="{$router->url('category', ['id' => $category->id])}" class="badge badge-primary mr-1">{$category->title|escape}</a>
         {/foreach}
     </div>
