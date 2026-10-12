@@ -22,7 +22,11 @@ class Storage
     public function getArticle(int $id): ?Article
     {
         $statement = $this->pdo()
-            ->prepare('SELECT * FROM articles WHERE id = ?');
+            ->prepare(<<< SQL
+                SELECT * FROM articles
+                WHERE id = ?
+                SQL
+            );
         $statement->execute([$id]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -37,12 +41,16 @@ class Storage
     public function getCategory(int $id): ?Category
     {
         $statement = $this->pdo()
-            ->prepare(
-                'SELECT c.*, count(arl.aid) as articles_count
-                 FROM categories c
-                 LEFT JOIN article_category_link as arl on arl.cid=c.id
-                 WHERE c.id = ?
-                group by c.id'
+            ->prepare(<<< SQL
+                SELECT c.*, latest.articles_count
+                FROM categories c
+                LEFT JOIN (
+                    SELECT arl.cid, COUNT(*) AS articles_count
+                    FROM article_category_link arl
+                    GROUP BY arl.cid
+                ) latest ON latest.cid = c.id
+                WHERE c.id = ?
+                SQL
             );
         $statement->execute([$id]);
         $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -57,8 +65,7 @@ class Storage
     public function getCategories(): array
     {
         $statement = $this->pdo()
-            ->prepare(
-                <<< SQL
+            ->prepare(<<< SQL
                 SELECT c.*, latest.last_created, latest.articles_count
                 FROM categories AS c
                 inner JOIN (
@@ -84,17 +91,18 @@ class Storage
     public function getArticleCategories(int $id): array
     {
         $statement = $this->pdo()
-            ->prepare(
-                'SELECT c.*
-                 FROM categories c
-                 INNER JOIN article_category_link l ON l.cid = c.id
-                 WHERE l.aid = ?
-                 ORDER BY c.id'
+            ->prepare(<<< SQL
+                SELECT c.*
+                FROM categories c
+                INNER JOIN article_category_link l ON l.cid = c.id
+                WHERE l.aid = ?
+                ORDER BY c.id
+                SQL
             );
         $statement->execute([$id]);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(Category::class . '::fromRow', $rows);
+        return array_map(fn(array $row) => Category::fromRow($row), $rows);
     }
 
     /**
@@ -108,17 +116,18 @@ class Storage
         $order = $sort === 'views' ? 'a.views DESC' : 'a.created_at DESC';
 
         $statement = $this->pdo()
-            ->prepare(
-                "SELECT a.*
-                 FROM articles a
-                 INNER JOIN article_category_link l ON l.aid = a.id
-                 WHERE l.cid = ?
-                 ORDER BY {$order}"
+            ->prepare(<<< SQL
+                SELECT a.*
+                FROM articles a
+                INNER JOIN article_category_link l ON l.aid = a.id
+                WHERE l.cid = ?
+                ORDER BY {$order}
+                SQL
             );
         $statement->execute([$cid]);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(Article::class . '::fromRow', $rows);
+        return array_map(fn(array $row) => Article::fromRow($row), $rows);
     }
 
     /**
