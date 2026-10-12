@@ -9,24 +9,27 @@ class Version20261009214400CreateArticlesTable extends Migration
 {
     public function up(): void
     {
-        $this->db->exec(
-            'CREATE TABLE articles (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                description VARCHAR(511) NOT NULL,
-                text TEXT NULL DEFAULT NULL,
-                image VARCHAR(255) NULL DEFAULT NULL,
-                views INT UNSIGNED NOT NULL DEFAULT 0,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-                INDEX `PK_articles_views` (`views` DESC) USING BTREE,
-                INDEX `PK_articles_published_at` (`created_at` DESC) USING BTREE
-            ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci'
-        );
+        $this->db->exec(<<<SQL
+            CREATE TABLE `articles` (
+                `id` int unsigned NOT NULL AUTO_INCREMENT,
+                `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+                `description` varchar(511) COLLATE utf8mb4_general_ci NOT NULL,
+                `text` text COLLATE utf8mb4_general_ci,
+                `image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+                `views` int unsigned NOT NULL DEFAULT '0',
+                `created_at` datetime NOT NULL,
+                `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                KEY `PK_articles_views` (`views` DESC) USING BTREE,
+                KEY `PK_articles_published_at` (`created_at` DESC) USING BTREE
+                ) ENGINE=InnoDB AUTO_INCREMENT=501 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+            SQL);
     }
 
     public function down(): void
     {
-        $this->db->exec('DROP TABLE IF EXISTS articles');
+        $this->db->exec(<<<SQL
+            DROP TABLE IF EXISTS articles
+        SQL);
     }
 }
