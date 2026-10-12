@@ -64,26 +64,26 @@ class Router
         $path = $this->normalizePath($uri);
         $allowed = [];
 
-        foreach ($this->routes as $route) {
-            $params = [];
-            if (!$this->match($route['path'], $path, $params)) {
-                continue;
-            }
-            if ($route['method'] !== $method) {
-                $allowed[] = $route['method'];
-                continue;
-            }
+            foreach ($this->routes as $route) {
+                $params = [];
+                if (!$this->match($route['path'], $path, $params)) {
+                    continue;
+                }
+                if ($route['method'] !== $method) {
+                    $allowed[] = $route['method'];
+                    continue;
+                }
 
-            $result = $this->call($route['handler'], $params);
+                $result = $this->call($route['handler'], $params);
 
-            if ($result instanceof Response) {
-                $result->send();
+                if ($result instanceof Response) {
+                    $result->send();
+                    return;
+                }
+
+                echo $result;
                 return;
             }
-
-            echo $result;
-            return;
-        }
 
         if ($allowed !== []) {
             Response::html(($this->methodNotAllowedHandler)($path), 405)

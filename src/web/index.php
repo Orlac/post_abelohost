@@ -53,13 +53,13 @@ $router->get('/category/{id:(\d+)}/', function (string $id): string|Response {
 $router->get('/info', 'pageInfo', 'info');
 $router->get('/health', static fn (): string => pageHealth($database), 'health');
 
-// try {
+try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
-// } catch (AppException $ex) {
-//     /**
-//      * @var ErrorHandler $handler
-//      */
-//     $handler = Container::get(ErrorHandler::class);
-//     echo $handler->renderError($ex);
-// }
+} catch (AppException $ex) {
+    /**
+     * @var ErrorHandler $handler
+     */
+    $handler = Container::get(ErrorHandler::class);
+    echo $handler->renderError($ex);
+}
 
